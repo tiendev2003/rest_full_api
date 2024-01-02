@@ -64,7 +64,7 @@ public class Product {
 	@Column(name = "sizes")
 	private Set<Size> sizes = new HashSet<>();
 
-	private String images;
+	 
 
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Rating> ratings = new ArrayList<>();
@@ -78,7 +78,11 @@ public class Product {
 	@Column(name = "status")
 	private int status;
 
- 
+	@OneToMany(mappedBy = "product")
+    private List<ProductRelated> relatedProducts;
+
+	@OneToMany(mappedBy = "product")
+    private List<Image> images;
 
 	@ManyToOne()
 	@JoinColumn(name = "category_id")

@@ -2,30 +2,23 @@ package fpt.com.rest_full_api.service.ịmpl;
 
 import java.util.*;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fpt.com.rest_full_api.exception.UserException;
 import fpt.com.rest_full_api.model.UserEntity;
 import fpt.com.rest_full_api.model.emum.Rank;
 import fpt.com.rest_full_api.repository.UserRepository;
-import fpt.com.rest_full_api.request.PasswordResetRequest;
+
 import fpt.com.rest_full_api.security.JWTGenerator;
 import fpt.com.rest_full_api.service.UserService;
 
 @Service
 public class UserServiceImplementation implements UserService {
-
+	@Autowired
 	private UserRepository userRepository;
+	@Autowired
 	private JWTGenerator jwtTokenProvider;
-	private final PasswordEncoder passwordEncoder;
-
-	public UserServiceImplementation(UserRepository userRepository, JWTGenerator jwtTokenProvider,
-			PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.jwtTokenProvider = jwtTokenProvider;
-		this.passwordEncoder = passwordEncoder;
-	}
 
 	@Override
 	public UserEntity findUserById(Long userId) throws UserException {
@@ -106,18 +99,6 @@ public class UserServiceImplementation implements UserService {
 	@Override
 	public List<UserEntity> getAllUsers() {
 		return userRepository.findAll();
-	}
-
-	@Override
-	public Boolean changePassword(PasswordResetRequest request) throws UserException {
-		if (request.getPassword() != null && request.getPassword().equals(request.getPassword2())) {
-			return false;
-		}
-		UserEntity user = userRepository.findByEmail(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword2()));
-		user.setPasswordResetCode(null);
-
-		return true;
 	}
 
 }

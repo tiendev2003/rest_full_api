@@ -2,7 +2,7 @@ package fpt.com.rest_full_api.request;
 
 import java.util.*;
 
- 
+import fpt.com.rest_full_api.model.Image;
 import fpt.com.rest_full_api.model.Size;
 import lombok.Data;
 
@@ -27,7 +27,7 @@ public class CreateProductRequest {
 
     private Set<Size> size=new HashSet<>();
 
-    private String images;
+    private List<Image> images=new ArrayList<>();
 
     private String topLavelCategory;
 
