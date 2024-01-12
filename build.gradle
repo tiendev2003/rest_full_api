@@ -15,6 +15,9 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	 all {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 }
 
 repositories {
@@ -52,6 +55,9 @@ implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-ser
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	// https://mvnrepository.com/artifact/org.postgresql/postgresql
 implementation 'org.postgresql:postgresql:42.7.1'
+
+implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+
 
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

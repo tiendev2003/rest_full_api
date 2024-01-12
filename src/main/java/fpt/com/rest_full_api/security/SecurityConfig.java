@@ -1,10 +1,10 @@
 package fpt.com.rest_full_api.security;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -12,14 +12,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
-
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -69,9 +65,12 @@ public class SecurityConfig {
 
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
                     corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-                    corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                    corsConfiguration.setAllowedHeaders(
+                            Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization"));
+
                     corsConfiguration.setAllowCredentials(true);
                     corsConfiguration.setMaxAge(3600L);
                     return corsConfiguration;
@@ -111,5 +110,7 @@ public class SecurityConfig {
     HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
+
+   
 
 }

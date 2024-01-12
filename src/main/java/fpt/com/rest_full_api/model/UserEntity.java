@@ -64,9 +64,7 @@ public class UserEntity {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Address> addresses = new ArrayList<>();
 
-	@Embedded
-	@ElementCollection
-	@CollectionTable(name = "payment_information", joinColumns = @JoinColumn(name = "user_id"))
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PaymentInformation> paymentInformation = new ArrayList<>();
 
 	@JsonIgnore

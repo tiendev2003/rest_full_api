@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
- 
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -12,7 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +30,7 @@ import lombok.Setter;
 public class Product {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "title")
@@ -81,8 +79,9 @@ public class Product {
 	@OneToMany(mappedBy = "product")
     private List<ProductRelated> relatedProducts;
 
-	@OneToMany(mappedBy = "product")
-    private List<Image> images;
+	 
+	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
 
 	@ManyToOne()
 	@JoinColumn(name = "category_id")

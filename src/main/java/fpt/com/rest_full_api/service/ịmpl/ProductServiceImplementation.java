@@ -1,34 +1,45 @@
 package fpt.com.rest_full_api.service.ịmpl;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.cloudinary.Cloudinary;
+
 import fpt.com.rest_full_api.exception.ProductException;
-import fpt.com.rest_full_api.model.*;
-import fpt.com.rest_full_api.repository.*;
-import fpt.com.rest_full_api.request.*;
+import fpt.com.rest_full_api.model.Category;
+import fpt.com.rest_full_api.model.Image;
+import fpt.com.rest_full_api.model.Product;
+import fpt.com.rest_full_api.repository.CategoryRepository;
+import fpt.com.rest_full_api.repository.ProductRepository;
+import fpt.com.rest_full_api.request.CreateProductRequest;
 import fpt.com.rest_full_api.service.ProductService;
 
 @Service
 public class ProductServiceImplementation implements ProductService {
 
+	@Autowired
 	private ProductRepository productRepository;
+	@Autowired
 	private CategoryRepository categoryRepository;
+	@Autowired
+	private Cloudinary cloudinary;
 
-	public ProductServiceImplementation(ProductRepository productRepository, CategoryRepository categoryRepository) {
-		this.productRepository = productRepository;
-
-		this.categoryRepository = categoryRepository;
-	}
+	private static final Path CURRENT_FOLDER = Paths.get(System.getProperty("user.dir"));
 
 	@Override
 	public Product createProduct(CreateProductRequest req) {
@@ -73,7 +84,7 @@ public class ProductServiceImplementation implements ProductService {
 		product.setDescription(req.getDescription());
 		product.setDiscountedPrice(req.getDiscountedPrice());
 		product.setDiscountPersent(req.getDiscountPersent());
-		product.setImages(req.getImages());
+
 		product.setBrand(req.getBrand());
 		product.setPrice(req.getPrice());
 		product.setSizes(req.getSize());
@@ -82,9 +93,30 @@ public class ProductServiceImplementation implements ProductService {
 		product.setCategory(thirdLevel);
 		product.setCreatedAt(LocalDateTime.now());
 
-		Product savedProduct = productRepository.save(product);
+		Path staticPath = Paths.get("src/main/resources/static");
+		Path imagePath = Paths.get("uploads");
+		List<Image> images = req.getImages().stream().map(m -> {
+			Image img = new Image();
+			Path file = CURRENT_FOLDER.resolve(staticPath)
+					.resolve(imagePath).resolve(m.getOriginalFilename());
+			try (OutputStream os = Files.newOutputStream(file)) {
+				Map<String, Object> options = Map.of("public_id", "uploads/" + m.getOriginalFilename(), "overwrite",
+						true, "resource_type", "auto");
+				// Map<String, Object> map = this.cloudinary.uploader().upload(m.getBytes(), Map.of());
 
-		System.out.println("products - " + product);
+				img.setName("uploads/" + m.getOriginalFilename());
+				os.write(m.getBytes());
+				os.close();
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+			img.setProduct(product);
+			return img;
+		}).collect(Collectors.toList());
+		product.setImages(images);
+
+		Product savedProduct = productRepository.save(product);
 
 		return savedProduct;
 	}
